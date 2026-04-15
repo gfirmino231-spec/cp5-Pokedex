@@ -1,41 +1,51 @@
-const container = document.getElementById("pokemon-container");
-const search = document.getElementById("search");
+const pokemonData = [
+  { name: "Bulbasaur", type: "planta", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" },
+  { name: "Charmander", type: "fogo", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png" },
+  { name: "Squirtle", type: "agua", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png" }
+];
 
-let pokemons = [];
+function renderPokemons(filter = "todos") {
+  const grid = document.getElementById("pokemonGrid");
+  grid.innerHTML = "";
 
-// Função para buscar da API
-async function fetchPokemons() {
-    for (let i = 1; i <= 50; i++) {
-        let res = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
-        let data = await res.json();
+  const list = filter === "todos"
+    ? pokemonData
+    : pokemonData.filter(p => p.type === filter);
 
-        pokemons.push(data);
-        createCard(data);
-    }
-}
-
-// Criar card na tela
-function createCard(pokemon) {
+  list.forEach(p => {
     const div = document.createElement("div");
-    div.classList.add("card");
-
-    div.innerHTML = `
-        <h3>${pokemon.name}</h3>
-        <img src="${pokemon.sprites.front_default}">
-    `;
-
-    container.appendChild(div);
+    div.className = "poke-card";
+    div.innerHTML = `<img src="${p.sprite}" onclick="openModal('${p.name}')">`;
+    grid.appendChild(div);
+  });
 }
 
-// Filtro de busca
-search.addEventListener("input", () => {
-    container.innerHTML = "";
+function openModal(name) {
+  document.getElementById("modalName").innerText = name;
+  document.getElementById("modal").classList.add("active");
+}
 
-    const filtered = pokemons.filter(p =>
-        p.name.includes(search.value.toLowerCase())
-    );
+document.getElementById("modalClose").onclick = () => {
+  document.getElementById("modal").classList.remove("active");
+};
 
-    filtered.forEach(createCard);
+document.getElementById("filterList").addEventListener("click", e => {
+  if (e.target.dataset.type) {
+    renderPokemons(e.target.dataset.type);
+  }
 });
 
-fetchPokemons();
+function scrollToIntegrantes() {
+  document.getElementById("integrantes").scrollIntoView({ behavior: "smooth" });
+}
+
+function updateCard() {
+  document.getElementById("previewName").innerText =
+    document.getElementById("cardName").value;
+
+  document.getElementById("previewHP").innerText =
+    document.getElementById("cardHP").value;
+}
+
+// INIT
+renderPokemons();
